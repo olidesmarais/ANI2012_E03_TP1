@@ -41,14 +41,6 @@ class Slider {
     //Indicateur
     stroke(100);
     point(posIndicateur.x, posIndicateur.y);
-    /*if (!deplacement) {
-      stroke(100);
-      if(isJour) {
-        point(posJour.x, posJour.y);
-      } else {
-        point(posNuit.x, posNuit.y);
-      }
-    }*/
   }
   
   void update() {

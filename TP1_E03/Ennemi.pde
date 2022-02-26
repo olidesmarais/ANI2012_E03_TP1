@@ -1,76 +1,139 @@
 class Ennemi {
-  float posX, posY;
-  float diametre;
+  int posX, posY;
   Jauge jaugeVie;
-  
-  //Jauge de vie
-  //int niveauVie;
-  //float niveauVieCourant;
-  //final int niveauVieMax = 10;
+  int dimensionImg;
+  PImage img; 
+  int idxImg;
   
   //Constructeur
   Ennemi() {
-    posX = random(dimensionX);
-    posY = random(height - hauteurCockpit);
-    diametre = random(40.0f, 60.0f);
+    //Dimensions
+    dimensionImg = int(random(200.0f, 400.0f));
     
-    jaugeVie = new Jauge(posX, posY - diametre, 50, 10, 10, 0.5f);
+    //Position
+    posX = int(random(0 - dimensionImg / 2, dimensionX - dimensionImg / 2));
+    posY = int(random(0 - dimensionImg / 2, height - hauteurCockpit - dimensionImg / 2));
     
-    //niveauVie = niveauVieMax;
-    //niveauVieCourant = float(niveauVieMax);
+    //Jauge de vie
+    jaugeVie = new Jauge(posX + dimensionImg / 2, posY + dimensionImg / 8, 50, 10, 10, 0.5f, color(0, 255, 0, 255));
+    
+    //Image
+    img = createImage(dimensionImg, dimensionImg, ARGB);
+    idxImg = 0;
   }
   
   void render() {
-    if(jaugeVie.niveauCourant > 5)
-      fill(255, 0, 0, 255);
-    else 
-      fill(255, 0, 0, map(jaugeVie.niveauCourant, 0, 5, 0, 255));
+    imageMode(CORNER);
     
-    //fill(255, 0, 0);
-    noStroke();
-    ellipse(posX, posY, diametre, diametre);
+    if(jaugeVie.niveauCourant > 5)
+      tint(255, 255);
+    else 
+      tint(255, map(jaugeVie.niveauCourant, 0, 5, 0, 255));
+    
+    
+    img.copy(imgEnnemis[idxImg], 0, 0, 400, 400, 0, 0, dimensionImg, dimensionImg);
+    image(img, posX, posY);
     
     if (jaugeVie.niveauCourant > jaugeVie.niveau) {
-      affiherJaugeVie();
+        jaugeVie.render();
     }
+    
+    float hasard;
+    
+    //Dans 1% des cas, la séquence d'images est enclenchée
+    if (idxImg == 0) {
+      //hasard = 0;
+      hasard = random(10.0f); 
+      if (hasard > 9.9f) {
+        idxImg++;
+      }
+    }
+    
+    //Image suivante de la sequence d'image
+    if (idxImg > 0 && idxImg < 6) {
+      idxImg++;
+    } else if (idxImg == 6) {
+      idxImg = 0;
+    }
+    tint(255, 255);
   }
   
-  void touche (float clicX, float clicY) {
-    float distance = sqrt(sq(posX - clicX) + sq(posY - clicY));
-    //Touché directement
-    if (distance <= diametre / 2) {
+  void verifierDegats (float clicX, float clicY) {
+    
+    //Emplacement relatif de l'attaque
+    int posRelativeX = int(clicX) - posX;
+    int posRelativeY = int(clicY) - posY;
+    
+    //Vérifier un contact direct
+    if (verifierContact(posRelativeX, posRelativeY))
       jaugeVie.niveau -= 10;
-    //Touché indirectement
-    } else if (distance <= diametreAttaqueMax / 2 + diametre / 2) {
-      jaugeVie.niveau -= 5;
+    else {
+      int posCx, posCy;
+      
+      for (float angle = radians(0) ; angle < radians(360) ; angle += 0.1) {
+          //Position du pixel vérifier
+          posCx = posRelativeX + int(cos(angle) * diametreAttraperEtoile);
+          posCy = posRelativeY + int(sin(angle) * diametreAttraperEtoile);
+          
+          if (verifierContact(posCx, posCy)) {
+            jaugeVie.niveau -= 5;
+            return;
+          }
+      }
     }
+      
+    /*//Vérifier si l'attaque est dans le cadre de l'image
+    if (posRelativeX >= 0 && posRelativeX <= dimensionImg && posRelativeY >= 0 && posRelativeY <= dimensionImg) {
+      //Index du pixel de l'image
+      int idxPixel = dimensionImg * posRelativeY + posRelativeX;
+      
+      //Charger l'image actuelle
+      img.loadPixels();
+      
+      //Touché direct
+      if (alpha(img.pixels[idxPixel]) > alpha(0) ) {
+        jaugeVie.niveau -= 10;
+        
+      //Touché indirect
+      } else {
+        for (float angle = radians(0) ; angle < radians(360) ; angle += 0.1) {
+          //Position du pixel vérifier
+          int posCx = posRelativeX + int(cos(angle) * diametreAttraperEtoile);
+          int posCy = posRelativeY + int(sin(angle) * diametreAttraperEtoile);
+          
+          //Index du pixel
+          idxPixel = dimensionImg * posCy + posCx;
+          
+          //Si le pixel est dans le cadre de l'image
+          if (idxPixel >= 0 && idxPixel < img.pixels.length) {
+            //Détecter si touché
+            if (alpha(img.pixels[idxPixel]) > 0) {
+              jaugeVie.niveau -= 5;
+              return;
+            }
+          }
+        }
+      }
+    }*/
   }
-  
-  void affiherJaugeVie() {
-    jaugeVie.render();
     
-    /*
-    //int longueur = 50;
-    //PVector position = new PVector(posX, posY - diametre);
-    
-    rectMode(CORNER);
-    //Fond
-    noStroke();
-    fill(200);
-    rect(position.x, position.y, longueur, 10);
-    
-    //Intérieur
-    fill(0, 255, 100, 255);
-    float largeur = map(niveauVieCourant, 0, 10, 0, longueur);
-    rect(position.x, position.y, largeur, 10);
-    
-    //Dessus
-    stroke(150);
-    strokeWeight(2);
-    noFill();
-    rect(position.x, position.y, longueur, 10);
-    
-    //niveauVieCourant -= 0.3f;
-    */
+  boolean verifierContact(int posRelativeX, int posRelativeY) {
+    //Vérifier si l'attaque est dans le cadre de l'image
+    if (posRelativeX >= 0 && posRelativeX <= dimensionImg && posRelativeY >= 0 && posRelativeY <= dimensionImg) {
+      //Index du pixel de l'image
+      int idxPixel = dimensionImg * posRelativeY + posRelativeX;
+      
+      //Charger l'image actuelle
+      img.loadPixels();
+      
+      //Si le pixel est dans le cadre de l'image
+      if (idxPixel >= 0 && idxPixel < img.pixels.length) {
+        if (alpha(img.pixels[idxPixel]) > alpha(0) ) {
+          return true;
+        } else
+          return false;
+      }
+    }
+    return false;
   }
 }

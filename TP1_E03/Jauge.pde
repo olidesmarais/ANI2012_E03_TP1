@@ -4,14 +4,16 @@ class Jauge {
   float hauteur;
   float niveau, niveauMax, niveauCourant;
   float vitesseUpdate;
+  color couleur;
   
-  Jauge(float x, float y, float l, float h, float n, float v) {
+  Jauge(float x, float y, float l, float h, float n, float v, color c) {
     posX = x;
     posY = y;
     longueur = largeur = l;
     hauteur = h;
     niveauMax = niveau = niveauCourant = n;
     vitesseUpdate = v;
+    couleur = c;
   }
   
   void render() {
@@ -23,7 +25,7 @@ class Jauge {
     rect(posX, posY, longueur, hauteur);
     
     //Intérieur
-    fill(0, 255, 100);
+    fill(couleur);
     largeur = map(niveauCourant, 0, niveauMax, 0, longueur);
     rect(posX, posY, largeur, hauteur);
     

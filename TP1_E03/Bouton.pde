@@ -19,15 +19,19 @@ class Bouton {
     textAlign(CENTER, CENTER);
     
     fill(couleurFond);
-    if (verifierSuperposition())
+    if (verifierSuperposition()) {
       rect( position.x, position.y, largeur * 1.1f, hauteur * 1.1f);
-    else
+      fill(255, 0, 0);
+    } else {
       rect( position.x, position.y, largeur, hauteur);
+      fill(couleurPolice);
+    }
     
-    if (verifierSuperposition() && pressed)
+    /*if (verifierSuperposition() && pressed)
       fill(255, 0, 0);
     else
-      fill(couleurPolice);
+      fill(couleurPolice);*/
+      
     text(texte, position.x, position.y); 
   }
   

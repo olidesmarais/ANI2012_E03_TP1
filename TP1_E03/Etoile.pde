@@ -53,23 +53,12 @@ class Etoile {
   void render() {
     imageMode(CENTER);
     image(image, posX, posY);
-    
-    /*//Test
-    noFill();
-    strokeWeight(2);
-    stroke(255);
-    ellipse(posX, posY, diametreContour, diametreContour);*/
   }
   
-  boolean verifierSuperposition() {
-    
-    //À FAIRE : Stratégie cercle représentant
-    
-   float distance =  sqrt(sq(mouseX - posX) + sq(mouseY - posY));
-  
-    if (distance <= diametreAttraperEtoile / 2 + diametreContour / 2)
-      return true;
-    else
-      return false;
+  boolean verifierSuperposition() {    
+    float distance =  sqrt(sq(mouseX - posX) + sq(mouseY - posY));
+   
+    return (distance <= diametreAttraperEtoile / 2 + diametreContour / 2);
   }
+  
 }

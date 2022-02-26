@@ -22,6 +22,7 @@ final int dimensionY = 720;
 
 //Références
 int centreX, centreY;
+boolean pressed;
 
 //Structure du jeu
 boolean debut, jeu, fin;
@@ -33,9 +34,11 @@ Bouton bCommencer;
 boolean termine;
 boolean victoire;
 PImage imgCanevas;
-final int objectif = 30;
+final int objectif = 5;
 Bouton bRejouer;
 final int dimensionCadreFin = 400;
+SoundFile sonVictoire;
+SoundFile sonDefaite;
 
 //Environnement
 PImage imgAccueil;
@@ -52,8 +55,6 @@ boolean besoinEtoiles;
 ArrayList<Etoile> listeEtoiles;
 final float frequenceEtoiles = 1.0f;
 float delaiEtoiles;
-final float longEtoile = 20.0f;
-boolean pressed;
 SoundFile sonEtoile;
 PImage[] etoilesRef;
 final int diametreAttraperEtoile = 50;
@@ -63,6 +64,9 @@ final int diametreAttraperEtoile = 50;
 ArrayList<Ennemi> listeEnnemis;
 float delaiEnnemis;
 final float frequenceEnnemis = 2.0f;
+PImage[] imgEnnemis;
+PImage[] masqueEnnemis;
+SoundFile sonEnnemi;
 
 //Attaque
 final float diametreAttaqueMax = 150;
@@ -114,6 +118,8 @@ void setup() {
   termine = false;
   imgCanevas = createImage(dimensionX, dimensionY, RGB);
   bRejouer = new Bouton (centreX, centreY + dimensionCadreFin / 3, 200, 50, color(200), color(0), "Rejouer");
+  sonVictoire = new SoundFile(this, "victoire.aiff");
+  sonDefaite = new SoundFile(this, "sonDefaite.wav");
   
   //Environnement
   imgAccueil = loadImage("ACCEUIL.png");
@@ -132,8 +138,13 @@ void setup() {
   etoilesRef[1] = loadImage("ETOILE_PETITE.png");
   etoilesRef[2] = loadImage("ETOILE_RONDE.png");
   
+  //Ennemis
+  //imgEnnemi = loadImage("ennemi/alien01.png");
+  genererImageEnnemi();
+  sonEnnemi = new SoundFile(this, "Grunt2.wav");
+  
   //Jauge pouvoir
-  jaugeMagie = new Jauge(283, 518, 181, 30, 100, 1.0f);
+  jaugeMagie = new Jauge(283, 518, 181, 30, 100, 1.0f, color(255, 255, 0, 255));
   sonManqueMagie = new SoundFile(this, "SonManqueMagie.wav");
   sonManqueMagie.amp(0.1f); 
     
@@ -149,10 +160,20 @@ void draw() {
   //Écran d'accueil
   if (debut) {
     afficherAccueil();
+    
+    /*//Test
+    //int idx = 0;
+    image(imgEnnemis[0], 0, 0);
+    image(imgEnnemis[1], centreX, 0);
+    image(imgEnnemis[2], 0, centreY);
+    image(imgEnnemis[3], centreX, centreY);
+    //idx = (idx == 6) ? idx : 0;*/
   }
   
   //Déroulement du jeu
   if(jeu) {
+    //tint(255, 255);
+    
     //Écran principal
     afficherJeu();
 
@@ -196,10 +217,13 @@ void draw() {
     //Fin du jeu
     if (nbKills >= objectif || listeEnnemis.size() >= objectif) {
       termine = true;
-      if (nbKills >= objectif)
+      if (nbKills >= objectif) {
         victoire = true;
-      else
+        sonVictoire.play();
+      } else {
         victoire = false;
+        sonDefaite.play();
+      }
     }
     if (termine) {
       transitionFin();
@@ -233,18 +257,20 @@ void mouseReleased() {
   //Écran d'accueil
   if (debut) {
     if (bCommencer.verifierSuperposition()) {
-      initialisation();
+      clicCommencer();
+      /*initialisation();
       jeu = true;
-      debut = false;
+      debut = false;*/
     }
   }
 
   //Écran fin
   if (fin) {
     if (bRejouer.verifierSuperposition()) {
-      initialisation();
+      clicRejouer();
+      /*initialisation();
       fin = false;
-      jeu = true;
+      jeu = true;*/
     }
   }
   
@@ -264,7 +290,14 @@ void keyReleased() {
   //Musique
   if (key == 'm')
     musiqueOn = !musiqueOn;
-    
+  
+  //Activer bouton
+  if (keyCode == ENTER) {
+    if (debut)
+      clicCommencer();
+    if (fin)
+      clicRejouer();
+  }
 }
 
 void initialisation() {
@@ -306,6 +339,7 @@ void afficherAccueil() {
 
 void afficherJeu() {
   imageMode(CORNER);
+  //tint(255, 255);
   
   if(isJour) {
     image(cielJour, 0, 0);
@@ -318,6 +352,7 @@ void afficherJeu() {
 }
 
 void afficherFin() {
+  //tint(255, 255);
   
   //Cadre
   rectMode(CENTER);
@@ -344,6 +379,7 @@ void teinteEcran(color couleur) {
     tint(couleur);
     imageMode(CORNER);
     image(ecran, 0, 0);
+    tint(255, 255);
 }
 
 void afficherCockpit() {
@@ -406,6 +442,37 @@ void attraperEtoiles() {
   }
 }
 
+void genererImageEnnemi() {
+  String emplaImage = "ennemi/alien";
+  String emplaMasque = "ennemi/masque";
+  
+  imgEnnemis = new PImage[7]; 
+  masqueEnnemis = new PImage[7];
+  
+  PImage image;
+  //PImage masque;
+  
+  for (int idx = 0 ; idx < 7 ; idx++) {
+    //int idxImg = idx + 1;
+    
+    image = loadImage(emplaImage + nf(idx + 1, 2) + ".png");
+    masqueEnnemis[idx] = loadImage(emplaMasque + nf(idx + 1, 2) + ".png");
+    
+    imgEnnemis[idx] = createImage(400, 400, ARGB);
+    
+    //imgEnnemis.copy(image.mask(masque));
+    
+    //image.mask(masque);
+    imgEnnemis[idx] = image;
+    imgEnnemis[idx].mask(masqueEnnemis[idx]);
+    
+    //image(image, centreX, centreY);
+    
+    //imgEnnemis[idx] = loadImage(emplaImage + idxImg + ".png");
+    //imgEnnemis[idx].mask(masque);
+  }
+}
+
 void listerEnnemis() {
   int nbEnnemis = int(random(1, 4));
   listeEnnemis = new ArrayList<Ennemi>();
@@ -428,13 +495,14 @@ void ajouterEnnemi() {
   listeEnnemis.add(ennemi);
 
   //Feedback
-  teinteEcran(color(255, 0, 0));
+  teinteEcran(color(255, 0, 0, 255));
 }
 
 void updateEnnemis() {
   for (int idx = 0 ; idx < listeEnnemis.size() ; idx++) {
     listeEnnemis.get(idx).jaugeVie.update();
     if (listeEnnemis.get(idx).jaugeVie.niveauCourant <= 0) {
+      sonEnnemi.play();
       listeEnnemis.remove(idx);
       nbKills++;
     }
@@ -442,7 +510,7 @@ void updateEnnemis() {
 }
 
 void attaquer() {
-  //Emplacement
+  //Emplacement de l'attaque
   PVector position = new PVector(mouseX, mouseY);
   
   //Visuel
@@ -462,7 +530,7 @@ void attaquer() {
   
   //Vérifier les contacts
   for (int idx = 0 ; idx < listeEnnemis.size(); idx++)
-    listeEnnemis.get(idx).touche(position.x, position.y);
+    listeEnnemis.get(idx).verifierDegats(position.x, position.y);
 }
 
 void jouerMusique() {
@@ -490,4 +558,16 @@ void transitionFin() {
   imageMode(CORNER);
   imgCanevas.filter(BLUR, 10);
   image(imgCanevas, 0, 0);
+}
+
+void clicCommencer() {
+  initialisation();
+  jeu = true;
+  debut = false;
+}
+
+void clicRejouer() {
+  initialisation();
+  fin = false;
+  jeu = true;
 }
