@@ -59,4 +59,5 @@ class Bouton {
      
      //Retourner vrai s'il y a superposition dans les deux axes
      return (supX && supY);
+  }
 }
