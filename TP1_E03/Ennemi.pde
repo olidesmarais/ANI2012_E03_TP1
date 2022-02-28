@@ -1,24 +1,26 @@
 class Ennemi {
-  int posX, posY;
+  //int posX, posY;
+  PVector position;
   Jauge jaugeVie;
-  int dimensionImg;
+  int dimension;
   PImage img; 
   int idxImg;
   
   //Constructeur
   Ennemi() {
     //Dimensions
-    dimensionImg = int(random(200.0f, 400.0f));
+    dimension = int(random(200.0f, 400.0f));
     
     //Position
-    posX = int(random(0 - dimensionImg / 2, dimensionX - dimensionImg / 2));
-    posY = int(random(0 - dimensionImg / 2, height - hauteurCockpit - dimensionImg / 2));
+    int posX = int(random(0 - dimension / 2, dimensionX - dimension / 2));
+    int posY = int(random(0 - dimension / 2, height - hauteurCockpit - dimension / 2));
+    position = new PVector(posX, posY);
     
     //Jauge de vie
-    jaugeVie = new Jauge(posX + dimensionImg / 2, posY + dimensionImg / 8, 50, 10, 10, 0.5f, color(0, 255, 0, 255));
+    jaugeVie = new Jauge(position.x + dimension / 2, position.y + dimension / 8, 50, 10, 10, 0.5f, color(0, 255, 0, 255), color(150, 255));
     
     //Image
-    img = createImage(dimensionImg, dimensionImg, ARGB);
+    img = createImage(dimension, dimension, ARGB);
     idxImg = 0;
   }
   
@@ -34,8 +36,8 @@ class Ennemi {
       tint(255, map(jaugeVie.niveauCourant, 0, 5, 0, 255));
     
     //Copie de l'image de référence de l'ennemi à l'index en cours
-    img.copy(imgEnnemis[idxImg], 0, 0, 400, 400, 0, 0, dimensionImg, dimensionImg);
-    image(img, posX, posY);
+    img.copy(imgEnnemis[idxImg], 0, 0, 400, 400, 0, 0, dimension, dimension);
+    image(img, position.x, position.y);
     
     //La jauge de vie est activée lorsque le niveau de vie est en train de varier
     if (jaugeVie.niveauCourant > jaugeVie.niveau) {
@@ -67,8 +69,8 @@ class Ennemi {
   void verifierDegats (float clicX, float clicY) {
     
     //Emplacement relatif de l'attaque
-    int posRelativeX = int(clicX) - posX;
-    int posRelativeY = int(clicY) - posY;
+    int posRelativeX = int(clicX) - int(position.x);
+    int posRelativeY = int(clicY) - int(position.y);
     
     //Vérifier un contact direct
     if (verifierContact(posRelativeX, posRelativeY))
@@ -96,9 +98,9 @@ class Ennemi {
     
   boolean verifierContact(int posRelativeX, int posRelativeY) {
     //Vérifier si l'attaque est dans le cadre de l'image
-    if (posRelativeX >= 0 && posRelativeX <= dimensionImg && posRelativeY >= 0 && posRelativeY <= dimensionImg) {
+    if (posRelativeX >= 0 && posRelativeX <= dimension && posRelativeY >= 0 && posRelativeY <= dimension) {
       //Index du pixel de l'image
-      int idxPixel = dimensionImg * posRelativeY + posRelativeX;
+      int idxPixel = dimension * posRelativeY + posRelativeX;
       
       //Charger l'image actuelle
       img.loadPixels();

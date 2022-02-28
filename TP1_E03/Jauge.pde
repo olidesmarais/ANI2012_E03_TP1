@@ -4,16 +4,17 @@ class Jauge {
   float hauteur;
   float niveau, niveauMax, niveauCourant;
   float vitesseUpdate;
-  color couleur;
+  color couleurFond, couleurContour;
   
-  Jauge(float x, float y, float l, float h, float n, float v, color c) {
+  Jauge(float x, float y, float l, float h, float n, float v, color cF, color cC) {
     posX = x;
     posY = y;
     longueur = largeur = l;
     hauteur = h;
     niveauMax = niveau = niveauCourant = n;
     vitesseUpdate = v;
-    couleur = c;
+    couleurFond = cF;
+    couleurContour = cC;
   }
   
   void render() {
@@ -25,13 +26,14 @@ class Jauge {
     rect(posX, posY, longueur, hauteur);
     
     //Intérieur
-    fill(couleur);
+    fill(couleurFond);
     //La largeur est propotionnelle au niveau courant
     largeur = map(niveauCourant, 0, niveauMax, 0, longueur);
     rect(posX, posY, largeur, hauteur);
     
     //Dessus
-    stroke(150);
+    //stroke(150);
+    stroke(couleurContour);
     strokeWeight(5);
     noFill();
     rect(posX, posY, longueur, hauteur);
@@ -43,6 +45,7 @@ class Jauge {
     //une différence, le niveau courant va tendre vers le niveau absolu.
     if (niveau > niveauCourant) {
       niveauCourant += vitesseUpdate;
+      couleurContour = color(4, 51, 83, 255);
     } else if (niveau < niveauCourant) {
       niveauCourant -= vitesseUpdate;
     }

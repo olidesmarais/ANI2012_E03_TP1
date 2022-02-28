@@ -72,6 +72,8 @@ final float frequenceEnnemis = 2.0f;
 PImage[] imgEnnemis;
 PImage[] masqueEnnemis;
 SoundFile sonEnnemi;
+final PVector posEnnemisMin = new PVector (0 - 400 / 2, 0 - 400 / 2);
+final PVector posEnnemisMax = new PVector (dimensionX - 400 / 2, dimensionY - hauteurCockpit - 400 / 2);
 
 //Attaque
 final float diametreAttaqueMax = 150;
@@ -81,7 +83,7 @@ SoundFile sonAttaque;
 //Jauge magie
 Jauge jaugeMagie;
 SoundFile sonManqueMagie;
-
+boolean manqueMagie;
 
 //Gestion du temps
 float tempsEcoule, tempsCourant;
@@ -158,10 +160,11 @@ void setup() {
   sonAttaque = new SoundFile(this, "audios/sonAttaque.mp3");
   sonAttaque.amp(0.1f);
   
-  //Jauge pouvoir
-  jaugeMagie = new Jauge(283, 518, 181, 30, 100, 1.0f, color(255, 255, 0, 255));
+  //Jauge magie
+  jaugeMagie = new Jauge(283, 518, 175, 30, 100, 1.0f, color(255, 255, 0, 255), color(4, 51, 83, 255));
   sonManqueMagie = new SoundFile(this, "audios/SonManqueMagie.wav");
-  sonManqueMagie.amp(0.1f); 
+  sonManqueMagie.amp(0.1f);
+  //manqueMagie = false;
     
   //Musique
   musique = new SinOsc(this);
@@ -253,8 +256,11 @@ void mouseReleased() {
       if(mouseY < height - hauteurCockpit) {
         if (jaugeMagie.niveau >= 10)
           attaquer();
-        else
+        else {
           sonManqueMagie.play();
+          //manqueMagie = true;
+          jaugeMagie.couleurContour = color(255, 0, 0, 255);
+        }
       }
     }
   }
@@ -303,6 +309,10 @@ void keyReleased() {
     save("captures/capture" + nf(idxCapture, 2) + ".png");
     idxCapture++;
   }
+  
+  //Test
+  if (key == 'w')
+    println("x : " + mouseX + "; y : " + mouseY);
 }
 
 void initialisation() {
@@ -380,20 +390,10 @@ void afficherJeu() {
 }
 
 void afficherFin() {
-  //tint(255, 255);
-  
-  /*textAlign(CENTER, CENTER);
-  fill(255, 255, 0);
-  textFont(policeTitre, 120);
-  text("Victoire !", centreX, 200);
-  
-  fill(255);
-  textFont(policeTexte, 18);*/
-  
-  
   //Cadre
   rectMode(CENTER);
-  stroke(130);
+  //stroke(130);
+  stroke(4,51,83,255);
   strokeWeight(10);
   fill(255);
   rect(centreX, centreY, dimensionCadreFin, dimensionCadreFin);
@@ -442,8 +442,31 @@ void afficherCockpit() {
   imageMode(CORNER);
   image(cockpit, 0, 0);
 
-  //Outils
+  //Radar
+  PVector posRadar = new PVector(455, 505);
+  int hRadar = 100;
+  int wRadar = 145;
+  
+  //Affichage des triangles rouges sur le radar pour indiquer la position des ennemis
   fill(255, 0, 0);
+  noStroke();
+  float posRelativeX, posRelativeY, dimensionRelative;
+  for (int idx = 0 ; idx < listeEnnemis.size() ; idx++) {
+    //Déterminer la position des ennemis sur le radar
+    posRelativeX = map(listeEnnemis.get(idx).position.x, posEnnemisMin.x, posEnnemisMax.x, posRadar.x, posRadar.x + wRadar);
+    posRelativeY = map(listeEnnemis.get(idx).position.y, posEnnemisMin.y, posEnnemisMax.y, posRadar.y, posRadar.y + hRadar);
+    dimensionRelative = map(listeEnnemis.get(idx).dimension, 200, 400, 5, 10);
+    
+    //Affichage du triangle
+    triangle(
+      posRelativeX + dimensionRelative / 2, posRelativeY, 
+      posRelativeX, posRelativeY + dimensionRelative,
+      posRelativeX + dimensionRelative, posRelativeY + dimensionRelative
+    );
+  }
+  //Outils
+  fill(255);
+  textFont(policeTexte, 10);
   text(listeEnnemis.size(), 540, 579);
   sliderJourNuit.render();
   jaugeMagie.render();
@@ -508,23 +531,14 @@ void genererImageEnnemi() {
   //PImage masque;
   
   for (int idx = 0 ; idx < 6 ; idx++) {
-    //int idxImg = idx + 1;
     
     image = loadImage(emplaImage + nf(idx + 1, 2) + ".png");
     masqueEnnemis[idx] = loadImage(emplaMasque + nf(idx + 1, 2) + ".png");
     
     imgEnnemis[idx] = createImage(400, 400, ARGB);
-    
-    //imgEnnemis.copy(image.mask(masque));
-    
-    //image.mask(masque);
+
     imgEnnemis[idx] = image;
     imgEnnemis[idx].mask(masqueEnnemis[idx]);
-    
-    //image(image, centreX, centreY);
-    
-    //imgEnnemis[idx] = loadImage(emplaImage + idxImg + ".png");
-    //imgEnnemis[idx].mask(masque);
   }
 }
 

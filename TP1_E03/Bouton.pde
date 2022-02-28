@@ -25,8 +25,9 @@ class Bouton {
     
     //Afficher un comptour s'il en faut un
     if (contour) {
-      stroke(130);
-      strokeWeight(10);
+      //stroke(130);
+      stroke(4, 51, 83);
+      strokeWeight(5);
     } else {
       noStroke();
     }
