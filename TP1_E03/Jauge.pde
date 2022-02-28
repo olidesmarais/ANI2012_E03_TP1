@@ -26,6 +26,7 @@ class Jauge {
     
     //Intérieur
     fill(couleur);
+    //La largeur est propotionnelle au niveau courant
     largeur = map(niveauCourant, 0, niveauMax, 0, longueur);
     rect(posX, posY, largeur, hauteur);
     
@@ -37,6 +38,9 @@ class Jauge {
   }
   
   void update() {
+    //En tout temps, lorsque la jauge est affichée, on vérifie si le niveau absolu
+    //et différent du niveau courant, c'est-à-dire celui qui est affiché. S'il y a
+    //une différence, le niveau courant va tendre vers le niveau absolu.
     if (niveau > niveauCourant) {
       niveauCourant += vitesseUpdate;
     } else if (niveau < niveauCourant) {

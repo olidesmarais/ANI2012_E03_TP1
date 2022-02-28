@@ -7,12 +7,16 @@ class Etoile {
   int puissance;
   
   Etoile() {
+    //Position déterminée aléatoirement dans tout l'écran, sauf derrière let cockpit.
     posX = random(width);
     posY = random(height - hauteurCockpit);
     
+    //Détermination du type de l'étoie
+    //0-Grande 1-Petite 2-Ronde
     type = determinerType();
     
-    //Type 0-Grande 1-Petite 2-Ronde
+    //En fonction du type déterminé aléatoirement selon les probabilités, 
+    //les attributs associées au type sont accordées à l'étoile
     switch(type) {
       //Grande
       case 0 :
@@ -36,28 +40,40 @@ class Etoile {
         diametreContour = 45;
         break;
     }
+    //Copie de l'image de référence pour le bon type 
     image = createImage(largeur, hauteur, ARGB);
     image.copy(etoilesRef[type], 0, 0, largeur, hauteur, 0, 0, largeur, hauteur);
   }
   
   int determinerType() {
     float probabilite = random(10);
+    
+    //10% de chance d'avoir un grande étoile
     if (probabilite > 9.0f)
       return 0;
+    
+    //40% de chance d'avoir une petite étoile
     else if (probabilite > 5.0)
       return 1;
+    
+    //50% de chance d'avoir une étoile ronde
     else
       return 2;
   }
   
   void render() {
+    //Affichage de l'image associée à l'instance
     imageMode(CENTER);
     image(image, posX, posY);
   }
   
   boolean verifierSuperposition() {    
+    //Pytagore pour déterminer la distance qui sépare le centre du cerlce de contour
+    //de l'étoile et l'emplacement du clic
     float distance =  sqrt(sq(mouseX - posX) + sq(mouseY - posY));
    
+    //On considère un contact lorsque la distance est inférieure ou égale au rayon
+    //de cercle de l'attaque plus le rayon du cercle de comptour de l'étoile
     return (distance <= diametreAttraperEtoile / 2 + diametreContour / 2);
   }
   

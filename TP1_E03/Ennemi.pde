@@ -25,15 +25,19 @@ class Ennemi {
   void render() {
     imageMode(CORNER);
     
+    //Lorsque le niveau de vie est inférieur ou égal à 5, l'ennemi commence
+    //à disparaître proportionnellement à son niveau de vie. Sinon, sa transparence
+    //et sa couleur est normele.
     if(jaugeVie.niveauCourant > 5)
       tint(255, 255);
     else 
       tint(255, map(jaugeVie.niveauCourant, 0, 5, 0, 255));
     
-    
+    //Copie de l'image de référence de l'ennemi à l'index en cours
     img.copy(imgEnnemis[idxImg], 0, 0, 400, 400, 0, 0, dimensionImg, dimensionImg);
     image(img, posX, posY);
     
+    //La jauge de vie est activée lorsque le niveau de vie est en train de varier
     if (jaugeVie.niveauCourant > jaugeVie.niveau) {
         jaugeVie.render();
     }
@@ -50,11 +54,13 @@ class Ennemi {
     }
     
     //Image suivante de la sequence d'image
-    if (idxImg > 0 && idxImg < 6) {
+    if (idxImg > 0 && idxImg < 5) {
       idxImg++;
     } else if (idxImg == 6) {
       idxImg = 0;
     }
+    
+    //Rétablissement de l'opacité, au besoin
     tint(255, 255);
   }
   
@@ -67,54 +73,25 @@ class Ennemi {
     //Vérifier un contact direct
     if (verifierContact(posRelativeX, posRelativeY))
       jaugeVie.niveau -= 10;
+    
+    //Vérifier un contact indirect
     else {
       int posCx, posCy;
       
+      //On vérifie tout autour de l'emplacement du clic s'il y a un contact
       for (float angle = radians(0) ; angle < radians(360) ; angle += 0.1) {
           //Position du pixel vérifier
           posCx = posRelativeX + int(cos(angle) * diametreAttraperEtoile);
           posCy = posRelativeY + int(sin(angle) * diametreAttraperEtoile);
           
+          //S'il y a un contact, le niveau de vie est adapté
+          //On sort de la fonction dès le premier cocntact
           if (verifierContact(posCx, posCy)) {
             jaugeVie.niveau -= 5;
             return;
           }
       }
     }
-      
-    /*//Vérifier si l'attaque est dans le cadre de l'image
-    if (posRelativeX >= 0 && posRelativeX <= dimensionImg && posRelativeY >= 0 && posRelativeY <= dimensionImg) {
-      //Index du pixel de l'image
-      int idxPixel = dimensionImg * posRelativeY + posRelativeX;
-      
-      //Charger l'image actuelle
-      img.loadPixels();
-      
-      //Touché direct
-      if (alpha(img.pixels[idxPixel]) > alpha(0) ) {
-        jaugeVie.niveau -= 10;
-        
-      //Touché indirect
-      } else {
-        for (float angle = radians(0) ; angle < radians(360) ; angle += 0.1) {
-          //Position du pixel vérifier
-          int posCx = posRelativeX + int(cos(angle) * diametreAttraperEtoile);
-          int posCy = posRelativeY + int(sin(angle) * diametreAttraperEtoile);
-          
-          //Index du pixel
-          idxPixel = dimensionImg * posCy + posCx;
-          
-          //Si le pixel est dans le cadre de l'image
-          if (idxPixel >= 0 && idxPixel < img.pixels.length) {
-            //Détecter si touché
-            if (alpha(img.pixels[idxPixel]) > 0) {
-              jaugeVie.niveau -= 5;
-              return;
-            }
-          }
-        }
-      }
-    }*/
   }
     
   boolean verifierContact(int posRelativeX, int posRelativeY) {
@@ -128,6 +105,9 @@ class Ennemi {
       
       //Si le pixel est dans le cadre de l'image
       if (idxPixel >= 0 && idxPixel < img.pixels.length) {
+        
+        //On considère qu'il y a un contact si le pixel concerné n'est pas 
+        //complètement transparent
         if (alpha(img.pixels[idxPixel]) > alpha(0) ) {
           return true;
         } else
