@@ -309,10 +309,6 @@ void keyReleased() {
     save("captures/capture" + nf(idxCapture, 2) + ".png");
     idxCapture++;
   }
-  
-  //Test
-  if (key == 'w')
-    println("x : " + mouseX + "; y : " + mouseY);
 }
 
 void initialisation() {
