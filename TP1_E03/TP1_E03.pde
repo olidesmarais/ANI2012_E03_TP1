@@ -230,12 +230,12 @@ void draw() {
     //Le jeu prend fin si le nombre fixé comme objectif est atteint
     if (nbKills >= objectifVictoire || listeEnnemis.size() >= objectifDefaite) {
       termine = true;
-      //VICTOIRE : Le nombre d'ennemis éléminé atteint l'objectif
+      //VICTOIRE : Le nombre d'ennemis éléminé atteint l'objectifVictoire (30)
       //L'invasion des ennemis est empêchée.
       if (nbKills >= objectifVictoire) {
         victoire = true;
         sonVictoire.play();
-      //DÉFAITE : Le nombre d'ennemis à l'écran a atteint l'objectif
+      //DÉFAITE : Le nombre d'ennemis à l'écran a atteint l'objectifDefaite (5)
       //L'invasion des ennemis est une réussite.
       } else {
         victoire = false;
