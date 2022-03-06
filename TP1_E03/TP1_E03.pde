@@ -596,7 +596,7 @@ void genererImageEnnemi() {
 }
 
 //Fonction permettant de créer la collection d'ennemis à l'initialisation du jeu.
-//Un nombre aléatoile d'ennemis (entre 1 et 9) est ajouté à la collection.
+//Un nombre aléatoile d'ennemis (entre 1 et 3) est ajouté à la collection.
 void listerEnnemis() {
   int nbEnnemis = int(random(1, 4));
   listeEnnemis = new ArrayList<Ennemi>();
