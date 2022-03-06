@@ -35,8 +35,10 @@ boolean victoire;
 SoundFile sonVictoire;
 SoundFile sonDefaite;
 PImage imgCanevas;
-//Nombre d'ennemis à éliminer ou nombre maximal affiché à l'écran
-final int objectif = 30;
+//Nombre d'ennemis à éliminer pour gagner
+final int objectifVictoire = 30;
+//Nombre maximal affiché à l'écran
+final int objectifDefaite = 5;
 
 //Environnement
 PImage imgAccueil;
@@ -216,7 +218,7 @@ void draw() {
     //Jouer la musique
     //La vitesse de la musique est directement proportionnelle avec le nombre
     //d'ennemis dans la collection d'ennemis
-    frequenceMusique = map(listeEnnemis.size(), 0, objectif, 0.2f, 0.1f);
+    frequenceMusique = map(listeEnnemis.size(), 0, objectifDefaite, 0.2f, 0.1f);
     if (delaiMusique > frequenceMusique) {
       //Option pour inactiver le son (Touche 'm')
       if (musiqueOn)
@@ -226,11 +228,11 @@ void draw() {
     
     //Fin du jeu
     //Le jeu prend fin si le nombre fixé comme objectif est atteint
-    if (nbKills >= objectif || listeEnnemis.size() >= objectif) {
+    if (nbKills >= objectifVictoire || listeEnnemis.size() >= objectifDefaite) {
       termine = true;
       //VICTOIRE : Le nombre d'ennemis éléminé atteint l'objectif
       //L'invasion des ennemis est empêchée.
-      if (nbKills >= objectif) {
+      if (nbKills >= objectifVictoire) {
         victoire = true;
         sonVictoire.play();
       //DÉFAITE : Le nombre d'ennemis à l'écran a atteint l'objectif
@@ -346,6 +348,7 @@ void initialisation() {
   //Jauge pouvoir
   jaugeMagie.niveau = 100;
   jaugeMagie.niveauCourant = 100;
+  jaugeMagie.couleurContour = color(4, 51, 83, 255);
   nbKills = 0;
  
   //Gestion du temps
