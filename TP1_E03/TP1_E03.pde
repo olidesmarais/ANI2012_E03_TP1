@@ -65,7 +65,6 @@ ArrayList<Ennemi> listeEnnemis;
 float delaiEnnemis;
 final float frequenceEnnemis = 2.0f;
 PImage[] imgEnnemis;
-//PImage[] masqueEnnemis;
 SoundFile sonEnnemi;
 
 //Attaque
@@ -442,7 +441,7 @@ void afficherFin() {
     
     fill(0);
     textFont(policeTexte, 18);
-    text("Nombre d'ennemis : " + listeEnnemis.size(), centreX, centreY);
+    text("Nombre de kills : " + nbKills, centreX, centreY);
   }
   
   //Affichage du bouton pour rejouer

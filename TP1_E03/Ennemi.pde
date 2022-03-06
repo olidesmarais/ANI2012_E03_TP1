@@ -1,5 +1,4 @@
 class Ennemi {
-  //int posX, posY;
   PVector position;
   Jauge jaugeVie;
   int dimension;

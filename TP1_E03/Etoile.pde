@@ -1,5 +1,5 @@
 class Etoile {
-  float posX, posY;
+  PVector position;
   int hauteur, largeur;
   float diametreContour;
   int type;
@@ -8,8 +8,9 @@ class Etoile {
   
   Etoile() {
     //Position déterminée aléatoirement dans tout l'écran, sauf derrière let cockpit.
-    posX = random(width);
-    posY = random(height - hauteurCockpit);
+    float posX = random(width);
+    float posY = random(height - hauteurCockpit);
+    position = new PVector(posX, posY);
     
     //Détermination du type de l'étoie
     //0-Grande 1-Petite 2-Ronde
@@ -64,13 +65,13 @@ class Etoile {
   void render() {
     //Affichage de l'image associée à l'instance
     imageMode(CENTER);
-    image(image, posX, posY);
+    image(image, position.x, position.y);
   }
   
   boolean verifierSuperposition() {    
     //Pytagore pour déterminer la distance qui sépare le centre du cerlce de contour
     //de l'étoile et l'emplacement du clic
-    float distance =  sqrt(sq(mouseX - posX) + sq(mouseY - posY));
+    float distance =  sqrt(sq(mouseX -position.x) + sq(mouseY - position.y));
    
     //On considère un contact lorsque la distance est inférieure ou égale au rayon
     //de cercle de l'attaque plus le rayon du cercle de comptour de l'étoile
